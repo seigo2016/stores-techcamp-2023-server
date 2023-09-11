@@ -1,0 +1,11 @@
+type Item {
+    name: String! @id
+    shop: String!
+    price: Int!
+    users: [User]
+}
+
+type User {
+    name: String! @id
+    boughtItem: [Item] @hasInverse(field: "users")
+}

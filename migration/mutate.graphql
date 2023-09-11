@@ -1,0 +1,19 @@
+mutation {
+  item: addItem(input: [
+    { name: "item1" }
+    { name: "item2" }
+    { name: "item3" }
+    { name: "item4" }
+    { name: "item5" }
+    { name: "item6" }
+    { name: "item7" }
+    { name: "item8" }
+  ]) { numUids }
+}
+mutation {
+  item: addUser(input: [
+    { name: "user1" }
+    { name: "user2" }
+    { name: "user3" }
+  ]) { numUids }
+}
