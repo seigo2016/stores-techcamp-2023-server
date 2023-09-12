@@ -12,7 +12,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-func getUser(userName string) (db.User, error) {
+func getUser(userId string) (db.User, error) {
 	dc, cancel := getDgraphClient()
 	defer cancel()
 
@@ -20,7 +20,7 @@ func getUser(userName string) (db.User, error) {
 
 	q1 := fmt.Sprintf(`
 	{
-		node(func: eq(User.name, "%s")) {
+		node(func: uid("%s")) {
 		  uid
 		  expand(_all_) {
 			uid
@@ -28,7 +28,7 @@ func getUser(userName string) (db.User, error) {
 		  }
 		}	
 	  }
-	`, userName)
+	`, userId)
 
 	res, err := dc.NewTxn().Query(ctx, q1)
 	if err != nil {
@@ -48,21 +48,21 @@ func getUser(userName string) (db.User, error) {
 	return user, nil
 }
 
-func getItem(itemName string) (db.Item, error) {
+func getItem(itemId string) (db.Item, error) {
 	dc, cancel := getDgraphClient()
 	defer cancel()
 
 	ctx := context.Background()
 
 	q2 := fmt.Sprintf(`
-	{	node(func: eq(Item.name, "%s")) {
+	{	node(func: uid("%s")) {
 		uid
 		expand(_all_) {
 		  uid
 		  expand(_all_)
 		}
 	  }
-	}`, itemName)
+	}`, itemId)
 	res, err := dc.NewTxn().Query(ctx, q2)
 	if err != nil {
 		fmt.Println(err)
@@ -89,7 +89,6 @@ func postOrder(items []db.Item, user db.User) db.Order {
 
 	no := db.Order{
 		Uid:        "_:",
-		User:       user,
 		BoughtItem: items,
 		DType:      []string{"Order"},
 	}
@@ -108,23 +107,47 @@ func postOrder(items []db.Item, user db.User) db.Order {
 	if err != nil {
 		log.Fatal(err)
 	}
+	newOrders := append(user.Orders, no)
+
+	nu := db.User{
+		Uid:        user.Uid,
+		Name:       user.Name,
+		BoughtItem: user.BoughtItem,
+		Orders:     newOrders,
+	}
+
+	mu = &api.Mutation{
+		CommitNow: true,
+	}
+
+	pb, err = json.Marshal(nu)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	mu.SetJson = pb
+	response, err = dc.NewTxn().Mutate(ctx, mu)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	log.Println(response)
 
 	return no
 }
 
-func buy(itemName string, userName string) {
+func buy(itemId string, userId string) {
 	dc, cancel := getDgraphClient()
 	defer cancel()
 
 	ctx := context.Background()
 
-	un, err := getUser(userName)
+	un, err := getUser(userId)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	in, err := getItem(itemName)
+	in, err := getItem(itemId)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -169,4 +192,43 @@ func getDgraphClient() (*dgo.Dgraph, db.CancelFunc) {
 	}
 }
 
-func getOrders()
+func getOrder(uid string) (db.Order, error) {
+	dc, cancel := getDgraphClient()
+	defer cancel()
+
+	ctx := context.Background()
+	fmt.Println(uid)
+	q2 := fmt.Sprintf(`
+	{	node(func: uid(%s)) {
+		uid
+		expand(_all_){expand(_all_)}
+	  }
+	}`, uid)
+	res, err := dc.NewTxn().Query(ctx, q2)
+	if err != nil {
+		fmt.Println(err)
+	}
+	var decodeo struct {
+		Node []db.Order `json:"node,omitempty"`
+	}
+	fmt.Println(res.GetJson())
+	if err := json.Unmarshal(res.GetJson(), &decodeo); err != nil {
+		fmt.Println(err)
+		return db.Order{}, err
+	}
+	order := decodeo.Node[0]
+
+	return order, nil
+}
+
+func getOrders(userId string) ([]db.Order, error) {
+	u, _ := getUser(userId)
+
+	o := u.Orders
+	var orders []db.Order
+	for _, t := range o {
+		o1, _ := getOrder(t.Uid)
+		orders = append(orders, o1)
+	}
+	return orders, nil
+}

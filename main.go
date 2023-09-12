@@ -10,28 +10,67 @@ import (
 
 type Server struct{}
 
-func (h Server) GetItems(ctx echo.Context, itemId string) error {
-	return ctx.JSON(http.StatusOK, Item{})
+func (h Server) GetItems(ctx echo.Context) error {
+	return ctx.JSON(http.StatusOK, ResponseItem{})
+}
+
+func (h Server) GetUsers(ctx echo.Context, userId string) error {
+	return ctx.JSON(http.StatusOK, User{})
+}
+
+func (h Server) PostOrders(ctx echo.Context) error {
+	order := &RequestOrder{}
+	ctx.Bind(&order)
+	fmt.Println(order)
+	var it []db.Item
+	for _, i := range *order.Items {
+		ni, _ := getItem(*i.Id)
+		it = append(it, ni)
+	}
+	user, _ := getUser(*order.UserId)
+	o := postOrder(it, user)
+	return ctx.JSON(http.StatusOK, o)
+}
+
+func (h Server) GetOrders(ctx echo.Context, userId string) error {
+	orders, _ := getOrders(userId)
+	var reso []ResponseOrder
+	for _, i := range orders {
+		var ri []ResponseItem
+		for _, i := range i.BoughtItem {
+			ri = append(ri, ResponseItem{
+				Id:   &i.Uid,
+				Name: &i.Name,
+			})
+		}
+		reso = append(reso, ResponseOrder{
+			Items:  &ri,
+			UserId: &userId,
+		})
+	}
+	return ctx.JSON(http.StatusOK, reso)
 }
 
 func main() {
-	// e := echo.New()
-	// s := Server{}
+	e := echo.New()
+	s := Server{}
 
-	i1, err := getItem("item1")
-	i2, err := getItem("item2")
-	u1, err := getUser("user1")
-	if err != nil {
-		fmt.Println(err)
-	}
+	// i1, err := getItem("item1")
+	// i2, err := getItem("item2")
+	// u1, err := getUser("user1")
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
 
-	buy(i1.Name, u1.Name)
-	buy(i2.Name, u1.Name)
+	// buy(i1.Name, u1.Name)
+	// buy(i2.Name, u1.Name)
 
-	var items []db.Item
-	items = append(items, i1, i2)
-	postOrder(items, u1)
+	// var items []db.Item
+	// items = append(items, i1, i2)
+	// postOrder(items, u1)
 
-	// RegisterHandlers(e, s)
-	// e.Logger.Fatal(e.Start(":10080"))
+	// getOrders("0x101")
+
+	RegisterHandlers(e, s)
+	e.Logger.Fatal(e.Start(":10081"))
 }
