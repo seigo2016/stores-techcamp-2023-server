@@ -3,8 +3,9 @@
 import ProductCard from "@/components/ProductCard";
 import { Product } from "@/models";
 import { useOrderState, useTotalPriceState } from "@/globalStates";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { getProducts } from "@/usecases";
 
 const products: Product[] = [
   {
@@ -24,11 +25,18 @@ const products: Product[] = [
 export default function PageProduct() {
   const router = useRouter();
 
+  const [products, setProducts] = useState<Product[]>([]);
   const { order, initOrder, addOrderedProduct } = useOrderState();
   const totalPrice = useTotalPriceState();
 
   useEffect(() => {
     initOrder();
+  }, []);
+
+  useEffect(() => {
+    getProducts().then((products) => {
+      setProducts(products);
+    });
   }, []);
 
   const onClickProduct = (product: Product) => {
