@@ -1,4 +1,4 @@
-package main
+package db
 
 type CancelFunc func()
 
@@ -14,5 +14,12 @@ type User struct {
 	Uid        string   `json:"uid,omitempty"`
 	Name       string   `json:"User.name,omitempty"`
 	BoughtItem []Item   `json:"User.boughtItem,omitempty"`
+	DType      []string `json:"dgraph.type,omitempty"`
+}
+
+type Order struct {
+	Uid        string   `json:"uid,omitempty"`
+	User       User     `json:"Order.user,omitempty"`
+	BoughtItem []Item   `json:"Order.boughtItem,omitempty"`
 	DType      []string `json:"dgraph.type,omitempty"`
 }
