@@ -3,9 +3,16 @@ type Item {
     shop: String!
     price: Int!
     users: [User]
+    orders: [Order]
 }
 
 type User {
     name: String! @id
-    boughtItem: [Item] @hasInverse(field: "users")
+    boughtItem: [Item]
+    orders: [Order]
+}
+
+type Order {
+    user: [User]
+    boughtItem: [Item]
 }

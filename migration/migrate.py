@@ -17,13 +17,13 @@ def mutation():
 }
         """
     body2 = """
-mutation {
-  item: addUser(input: [
-    { name: "user1" }
-    { name: "user2" }
-    { name: "user3" }
-  ]) { numUids }
-}
+          mutation {
+            item: addUser(input: [
+              { name: "user1" }
+              { name: "user2" }
+              { name: "user3" }
+            ]) { numUids }
+          }
         """
 
     res = requests.post("http://localhost:8080/graphql", json={
