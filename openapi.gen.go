@@ -21,25 +21,32 @@ import (
 	"github.com/oapi-codegen/runtime"
 )
 
-// Item defines model for Item.
-type Item struct {
-	Id    *ItemId `json:"id,omitempty"`
-	Name  *string `json:"name,omitempty"`
-	Price *int    `json:"price,omitempty"`
-	Shop  *string `json:"shop,omitempty"`
-}
-
 // ItemId defines model for ItemId.
 type ItemId = string
 
-// Order defines model for Order.
-type Order struct {
-	Items *[]Item `json:"items,omitempty"`
-	User  *UserId `json:"user,omitempty"`
+// RequestItem defines model for RequestItem.
+type RequestItem struct {
+	Id       *ItemId `json:"id,omitempty"`
+	Quantity *int    `json:"quantity,omitempty"`
 }
 
-// OrderId defines model for OrderId.
-type OrderId = string
+// RequestOrder defines model for RequestOrder.
+type RequestOrder struct {
+	Items  *[]RequestItem `json:"items,omitempty"`
+	UserId *UserId        `json:"userId,omitempty"`
+}
+
+// ResponseItem defines model for ResponseItem.
+type ResponseItem struct {
+	Id   *ItemId `json:"id,omitempty"`
+	Name *string `json:"name,omitempty"`
+}
+
+// ResponseOrder defines model for ResponseOrder.
+type ResponseOrder struct {
+	Items  *[]ResponseItem `json:"items,omitempty"`
+	UserId *UserId         `json:"userId,omitempty"`
+}
 
 // User defines model for User.
 type User struct {
@@ -50,17 +57,11 @@ type User struct {
 // UserId defines model for UserId.
 type UserId = string
 
-// ItemIdInPath defines model for itemIdInPath.
-type ItemIdInPath = ItemId
-
-// OrderIdInPath defines model for orderIdInPath.
-type OrderIdInPath = OrderId
-
 // UserIdInPath defines model for userIdInPath.
 type UserIdInPath = UserId
 
 // PostOrdersJSONRequestBody defines body for PostOrders for application/json ContentType.
-type PostOrdersJSONRequestBody = Order
+type PostOrdersJSONRequestBody = RequestOrder
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -136,7 +137,7 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 // The interface specification for the client above.
 type ClientInterface interface {
 	// GetItems request
-	GetItems(ctx context.Context, itemId ItemIdInPath, reqEditors ...RequestEditorFn) (*http.Response, error)
+	GetItems(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PostOrdersWithBody request with any body
 	PostOrdersWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -144,14 +145,14 @@ type ClientInterface interface {
 	PostOrders(ctx context.Context, body PostOrdersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetOrders request
-	GetOrders(ctx context.Context, orderId OrderIdInPath, reqEditors ...RequestEditorFn) (*http.Response, error)
+	GetOrders(ctx context.Context, userId UserIdInPath, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetUsers request
 	GetUsers(ctx context.Context, userId UserIdInPath, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client) GetItems(ctx context.Context, itemId ItemIdInPath, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetItemsRequest(c.Server, itemId)
+func (c *Client) GetItems(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetItemsRequest(c.Server)
 	if err != nil {
 		return nil, err
 	}
@@ -186,8 +187,8 @@ func (c *Client) PostOrders(ctx context.Context, body PostOrdersJSONRequestBody,
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetOrders(ctx context.Context, orderId OrderIdInPath, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetOrdersRequest(c.Server, orderId)
+func (c *Client) GetOrders(ctx context.Context, userId UserIdInPath, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetOrdersRequest(c.Server, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -211,22 +212,15 @@ func (c *Client) GetUsers(ctx context.Context, userId UserIdInPath, reqEditors .
 }
 
 // NewGetItemsRequest generates requests for GetItems
-func NewGetItemsRequest(server string, itemId ItemIdInPath) (*http.Request, error) {
+func NewGetItemsRequest(server string) (*http.Request, error) {
 	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "itemId", runtime.ParamLocationPath, itemId)
-	if err != nil {
-		return nil, err
-	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/items/%s", pathParam0)
+	operationPath := fmt.Sprintf("/items")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -285,12 +279,12 @@ func NewPostOrdersRequestWithBody(server string, contentType string, body io.Rea
 }
 
 // NewGetOrdersRequest generates requests for GetOrders
-func NewGetOrdersRequest(server string, orderId OrderIdInPath) (*http.Request, error) {
+func NewGetOrdersRequest(server string, userId UserIdInPath) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orderId", runtime.ParamLocationPath, orderId)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "userId", runtime.ParamLocationPath, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -396,7 +390,7 @@ func WithBaseURL(baseURL string) ClientOption {
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
 	// GetItemsWithResponse request
-	GetItemsWithResponse(ctx context.Context, itemId ItemIdInPath, reqEditors ...RequestEditorFn) (*GetItemsResponse, error)
+	GetItemsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetItemsResponse, error)
 
 	// PostOrdersWithBodyWithResponse request with any body
 	PostOrdersWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostOrdersResponse, error)
@@ -404,7 +398,7 @@ type ClientWithResponsesInterface interface {
 	PostOrdersWithResponse(ctx context.Context, body PostOrdersJSONRequestBody, reqEditors ...RequestEditorFn) (*PostOrdersResponse, error)
 
 	// GetOrdersWithResponse request
-	GetOrdersWithResponse(ctx context.Context, orderId OrderIdInPath, reqEditors ...RequestEditorFn) (*GetOrdersResponse, error)
+	GetOrdersWithResponse(ctx context.Context, userId UserIdInPath, reqEditors ...RequestEditorFn) (*GetOrdersResponse, error)
 
 	// GetUsersWithResponse request
 	GetUsersWithResponse(ctx context.Context, userId UserIdInPath, reqEditors ...RequestEditorFn) (*GetUsersResponse, error)
@@ -413,7 +407,7 @@ type ClientWithResponsesInterface interface {
 type GetItemsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *Item
+	JSON200      *ResponseItem
 }
 
 // Status returns HTTPResponse.Status
@@ -435,7 +429,7 @@ func (r GetItemsResponse) StatusCode() int {
 type PostOrdersResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *Order
+	JSON200      *ResponseOrder
 }
 
 // Status returns HTTPResponse.Status
@@ -457,7 +451,7 @@ func (r PostOrdersResponse) StatusCode() int {
 type GetOrdersResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *Order
+	JSON200      *ResponseOrder
 }
 
 // Status returns HTTPResponse.Status
@@ -499,8 +493,8 @@ func (r GetUsersResponse) StatusCode() int {
 }
 
 // GetItemsWithResponse request returning *GetItemsResponse
-func (c *ClientWithResponses) GetItemsWithResponse(ctx context.Context, itemId ItemIdInPath, reqEditors ...RequestEditorFn) (*GetItemsResponse, error) {
-	rsp, err := c.GetItems(ctx, itemId, reqEditors...)
+func (c *ClientWithResponses) GetItemsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetItemsResponse, error) {
+	rsp, err := c.GetItems(ctx, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -525,8 +519,8 @@ func (c *ClientWithResponses) PostOrdersWithResponse(ctx context.Context, body P
 }
 
 // GetOrdersWithResponse request returning *GetOrdersResponse
-func (c *ClientWithResponses) GetOrdersWithResponse(ctx context.Context, orderId OrderIdInPath, reqEditors ...RequestEditorFn) (*GetOrdersResponse, error) {
-	rsp, err := c.GetOrders(ctx, orderId, reqEditors...)
+func (c *ClientWithResponses) GetOrdersWithResponse(ctx context.Context, userId UserIdInPath, reqEditors ...RequestEditorFn) (*GetOrdersResponse, error) {
+	rsp, err := c.GetOrders(ctx, userId, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -557,7 +551,7 @@ func ParseGetItemsResponse(rsp *http.Response) (*GetItemsResponse, error) {
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest Item
+		var dest ResponseItem
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -583,7 +577,7 @@ func ParsePostOrdersResponse(rsp *http.Response) (*PostOrdersResponse, error) {
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest Order
+		var dest ResponseOrder
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -609,7 +603,7 @@ func ParseGetOrdersResponse(rsp *http.Response) (*GetOrdersResponse, error) {
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest Order
+		var dest ResponseOrder
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -649,14 +643,14 @@ func ParseGetUsersResponse(rsp *http.Response) (*GetUsersResponse, error) {
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 
-	// (GET /items/{itemId})
-	GetItems(ctx echo.Context, itemId ItemIdInPath) error
+	// (GET /items)
+	GetItems(ctx echo.Context) error
 
 	// (POST /orders)
 	PostOrders(ctx echo.Context) error
 
-	// (GET /orders/{orderId})
-	GetOrders(ctx echo.Context, orderId OrderIdInPath) error
+	// (GET /orders/{userId})
+	GetOrders(ctx echo.Context, userId UserIdInPath) error
 
 	// (GET /users/{userId})
 	GetUsers(ctx echo.Context, userId UserIdInPath) error
@@ -670,16 +664,9 @@ type ServerInterfaceWrapper struct {
 // GetItems converts echo context to params.
 func (w *ServerInterfaceWrapper) GetItems(ctx echo.Context) error {
 	var err error
-	// ------------- Path parameter "itemId" -------------
-	var itemId ItemIdInPath
-
-	err = runtime.BindStyledParameterWithLocation("simple", false, "itemId", runtime.ParamLocationPath, ctx.Param("itemId"), &itemId)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter itemId: %s", err))
-	}
 
 	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.GetItems(ctx, itemId)
+	err = w.Handler.GetItems(ctx)
 	return err
 }
 
@@ -695,16 +682,16 @@ func (w *ServerInterfaceWrapper) PostOrders(ctx echo.Context) error {
 // GetOrders converts echo context to params.
 func (w *ServerInterfaceWrapper) GetOrders(ctx echo.Context) error {
 	var err error
-	// ------------- Path parameter "orderId" -------------
-	var orderId OrderIdInPath
+	// ------------- Path parameter "userId" -------------
+	var userId UserIdInPath
 
-	err = runtime.BindStyledParameterWithLocation("simple", false, "orderId", runtime.ParamLocationPath, ctx.Param("orderId"), &orderId)
+	err = runtime.BindStyledParameterWithLocation("simple", false, "userId", runtime.ParamLocationPath, ctx.Param("userId"), &userId)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter orderId: %s", err))
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter userId: %s", err))
 	}
 
 	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.GetOrders(ctx, orderId)
+	err = w.Handler.GetOrders(ctx, userId)
 	return err
 }
 
@@ -752,9 +739,9 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 		Handler: si,
 	}
 
-	router.GET(baseURL+"/items/:itemId", wrapper.GetItems)
+	router.GET(baseURL+"/items", wrapper.GetItems)
 	router.POST(baseURL+"/orders", wrapper.PostOrders)
-	router.GET(baseURL+"/orders/:orderId", wrapper.GetOrders)
+	router.GET(baseURL+"/orders/:userId", wrapper.GetOrders)
 	router.GET(baseURL+"/users/:userId", wrapper.GetUsers)
 
 }
@@ -762,15 +749,15 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/8RVz27cLBB/lU/z9YgWp7lUvrWXyuphV6pyqnKg9mRNZAOF2Ugri3evBuzuWqLZTZSo",
-	"JxuY4fdnYJigtaOzBg0FqCdwyqsRCX0aacKx6RqzU9SnsYEaHA8EGDUi1HMICPD466A9dlCTP6CA0PY4",
-	"Ks764PEBavhfnqBkXg2yyekxCrC+Q38BbY55Ndx2zme8Q7gIl0NejXYXZrC4ZCRXWXPy2luHnjRmr7tr",
-	"vVroTUBHxzQDeW32vOC8bs9XtCHco+el0FtXyIlimbE/H7ElDp2BSgDJwAJ5wnH9c0kInICV9+oIc0Wu",
-	"9rTAe6luifhdKPLursX7q+klInNSITgK0ObB8lKHofXakbZ88Hbb7/993jUggDQNmGdAwBP6kCNuNtWm",
-	"4t2tQ6OchhpuN9XmFkQ6tUmPTP7LKd/KyFN7JP6wasVYzAu+IjWpUny0g7MmZD8+VhV/WmsITcpTzg26",
-	"TZnyMTCR6QVXOyteK91+y7PnreZHeatTiFy1ongfBcjUDHLXsqEgcmcDbXNMvsEY6Ivtjm+mMF+GmNS8",
-	"m41/QMo+noyQ09wdny37mSH/hvBLC79+FnLluVEEOeX2/Kxcvonvqjb1lTcTu3qT4n16ONA/LdlriMG2",
-	"agABBz9ADT2Rq6VMk70NVN9U1adK8i6/AwAA//8gvI2x5QcAAA==",
+	"H4sIAAAAAAAC/8RVz47TPBB/lU/zcbTqLHtBucEFRRxagfaEOJhktvUqsd3xZKWqyrujsdM2gapbYCtO",
+	"ie2Z+f2xx95D7bvgHTqOUO4hGDIdMlIa9RGpaiq3MryRsXVQQpCBAmc6hHIMAQWE294SNlAy9agg1hvs",
+	"jGS9IXyEEv7XJyidV6N+yOnDMBwyEnDF2FWN/PEuCExksm4Ng4LPuO0xskQkwuQDEltMebZ5CXCsPCjY",
+	"9sax5d0ExTrGNRIIm3HKf3/CmifAS2qQziAzdvOfSyymIk5YhsjsZDyaeq13Z8nG4F3Ev7cp7/MvG3EJ",
+	"9JUsmii4iUey9ifeHGr+ljcPR7o/Bw8KrHv0stRgrMkGtl4abbX88t/7VQUK2HKLeQYUPCPFHHG3KBaF",
+	"VPcBnQkWSrhfFIt7UKlLkx59dHuNLB8RawRC6MBHTKcwpg7Ojqfgt0Uhn9o7RpfyTAitrVOmfoqCv7+y",
+	"yedbKYLnQpefZHZQoL2cnHwR+XiG7cqPDRjHGwcjf/DN7hWpTpo8k7q5LUewl3zR+3zoh0u7ObHn3/JW",
+	"s8fk6/mapxA9e2yGbyJbpq5TLe11U9HpsriZVnn9kJ4P2XOI1temBQU9tVDChjmUWqfJjY9c3hXFu0JL",
+	"lR8BAAD//3JpZQLNBwAA",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

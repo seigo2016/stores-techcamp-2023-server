@@ -10,9 +10,7 @@ servers:
     description: local
 
 paths:
-  "/items/{itemId}":
-    parameters:
-      - $ref: "#/components/parameters/itemIdInPath"
+  "/items":
     get:
       operationId: getItems
       responses:
@@ -21,7 +19,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Item"
+              
+                $ref: "#/components/schemas/ResponseItem"
 
   "/users/{userId}":
     parameters:
@@ -36,9 +35,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/User"
 
-  "/orders/{orderId}":
+  "/orders/{userId}":
     parameters:
-        - $ref: "#/components/parameters/orderIdInPath"
+        - $ref: "#/components/parameters/userIdInPath"
     get:
       operationId: getOrders
       responses:
@@ -47,7 +46,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Order"
+                $ref: "#/components/schemas/ResponseOrder"
   "/orders":
     post:
       operationId: postOrders
@@ -55,14 +54,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Order"
+              $ref: "#/components/schemas/RequestOrder"
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Order"
+                $ref: "#/components/schemas/ResponseOrder"
 
 components:
   parameters:
@@ -105,26 +104,47 @@ components:
         name:
           type: string
       
+    ResponseItems:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ResponseItem"
 
-    Item:
+    ResponseItem:
       type: object
       properties:
         id:
           $ref: "#/components/schemas/ItemId"
         name:
           type: string
-        shop:
-          type: string
-        price:
-          type: integer
-      
-    Order:
+  
+    RequestItem:
       type: object
       properties:
-        user:
+        id:
+          $ref: "#/components/schemas/ItemId"
+        quantity:
+          type: integer
+      
+    RequestOrder:
+      type: object
+      properties:
+        userId:
           $ref: "#/components/schemas/UserId"
         items:
           type: array
           items:
-            $ref: "#/components/schemas/Item"
+            $ref: "#/components/schemas/RequestItem"
+    
+    ResponseOrder:
+      type: object
+      properties:
+        userId:
+          $ref: "#/components/schemas/UserId"
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ResponseItem"
     

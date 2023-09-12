@@ -13,6 +13,5 @@ type User {
 }
 
 type Order {
-    user: [User]
-    boughtItem: [Item]
+    boughtItem: [Item] 
 }
