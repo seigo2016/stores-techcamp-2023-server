@@ -1,0 +1,130 @@
+openapi: 3.0.3
+
+info:
+  title: POS
+  version: 1.0.0
+  description: POS API
+  
+servers:
+  - url: "http://localhost:10080/"
+    description: local
+
+paths:
+  "/items/{itemId}":
+    parameters:
+      - $ref: "#/components/parameters/itemIdInPath"
+    get:
+      operationId: getItems
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Item"
+
+  "/users/{userId}":
+    parameters:
+      - $ref: "#/components/parameters/userIdInPath"
+    get:
+      operationId: getUsers
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  "/orders/{orderId}":
+    parameters:
+        - $ref: "#/components/parameters/orderIdInPath"
+    get:
+      operationId: getOrders
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+  "/orders":
+    post:
+      operationId: postOrders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Order"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+
+components:
+  parameters:
+    orderIdInPath:
+      name: orderId
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/OrderId"
+  
+    userIdInPath:
+      name: userId
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/UserId"
+
+    itemIdInPath:
+      name: itemId
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/ItemId"
+
+  schemas:
+    OrderId:
+      type: string
+      
+    ItemId:
+      type: string
+
+    UserId:
+      type: string
+
+    User:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UserId"
+        name:
+          type: string
+      
+
+    Item:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/ItemId"
+        name:
+          type: string
+        shop:
+          type: string
+        price:
+          type: integer
+      
+    Order:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/UserId"
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Item"
+    
