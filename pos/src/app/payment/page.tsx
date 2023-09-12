@@ -2,9 +2,12 @@
 
 import { useOrderState, useTotalPriceState } from "@/globalStates";
 import { ChangeEventHandler, useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { createOrder } from "@/usecases";
 
 export default function PagePayment() {
+  const router = useRouter();
+
   const { order } = useOrderState();
   const totalPrice = useTotalPriceState();
   const [givenMoneyAmount, setGivenMoneyAmount] = useState(0);
@@ -21,6 +24,11 @@ export default function PagePayment() {
     }
   };
 
+  const buy = () => {
+    createOrder(order);
+    router.push("/product");
+  };
+
   return (
     <div className="w-screen h-screen flex justify-center items-center">
       <div className="flex flex-col gap-[12px]">
@@ -33,7 +41,7 @@ export default function PagePayment() {
         <div>
           {charge < 0 ? "金額が不足しています" : `おつり : ${charge}円`}
         </div>
-        <Link href="/product">購入を確定する</Link>
+        <button onClick={buy}>購入を確定する</button>
       </div>
     </div>
   );
