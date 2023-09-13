@@ -1,11 +1,13 @@
 type Item {
-    name: String! @id
-    preview: String!
+    xid: String! @id
+    name: String!
+    preview: String
     price: Int!
 }
 
 type User {
-    name: String! @id
+    xid: String! @id
+    name: String!
     boughtItems: [Item]
     orders: [Order] 
 }
