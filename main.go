@@ -6,9 +6,24 @@ import (
 	"pos/db"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 type Server struct{}
+
+func (h Server) GetUserRecommends(ctx echo.Context, userId string) error {
+	items, _ := recommend(userId)
+	var it []ResponseItem
+	for _, i := range items {
+		it = append(it, ResponseItem{
+			Id:      &i.Uid,
+			Name:    &i.Name,
+			Price:   &i.Price,
+			Preview: &i.Preview,
+		})
+	}
+	return ctx.JSON(http.StatusOK, it)
+}
 
 func (h Server) GetItems(ctx echo.Context) error {
 	items, _ := getAllItems()
@@ -24,8 +39,13 @@ func (h Server) GetItems(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, it)
 }
 
-func (h Server) GetUsers(ctx echo.Context, userId string) error {
-	return ctx.JSON(http.StatusOK, User{})
+func (h Server) GetAllUsers(ctx echo.Context) error {
+	return ctx.JSON(http.StatusOK, []User{})
+}
+
+func (h Server) GetUserById(ctx echo.Context, userId string) error {
+	u, _ := getUser(userId)
+	return ctx.JSON(http.StatusOK, u)
 }
 
 func (h Server) PostOrders(ctx echo.Context) error {
@@ -65,23 +85,16 @@ func (h Server) GetOrders(ctx echo.Context, userId string) error {
 func main() {
 	e := echo.New()
 	s := Server{}
-
-	// i1, err := getItem("item1")
-	// i2, err := getItem("item2")
-	// u1, err := getUser("user1")
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
-
-	// buy(i1.Name, u1.Name)
-	// buy(i2.Name, u1.Name)
-
-	// var items []db.Item
-	// items = append(items, i1, i2)
-	// postOrder(items, u1)
-
-	// getOrders("0x101")
-
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins:     []string{"*"},
+		AllowCredentials: true,
+	}))
+	u1, _ := getUserByName("user1")
+	u2, _ := getUserByName("user2")
+	u3, _ := getUserByName("user3")
+	fmt.Println(u1.Uid)
+	fmt.Println(u2.Uid)
+	fmt.Println(u3.Uid)
 	RegisterHandlers(e, s)
-	e.Logger.Fatal(e.Start(":10081"))
+	e.Logger.Fatal(e.Start(":10082"))
 }

@@ -22,11 +22,24 @@ paths:
               
                 $ref: "#/components/schemas/ResponseItem"
 
+  "/users":
+    get:
+      operationId: getAllUsers
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+
   "/users/{userId}":
     parameters:
       - $ref: "#/components/parameters/userIdInPath"
     get:
-      operationId: getUsers
+      operationId: getUserById
       responses:
         "200":
           description: OK
@@ -34,6 +47,19 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
+
+  "/users/{userId}/recommends":
+    parameters:
+      - $ref: "#/components/parameters/userIdInPath"
+    get:
+      operationId: getUserRecommends
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseItems"
 
   "/orders/{userId}":
     parameters:

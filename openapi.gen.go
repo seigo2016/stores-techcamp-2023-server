@@ -47,6 +47,11 @@ type ResponseItem struct {
 	Price   *int    `json:"price,omitempty"`
 }
 
+// ResponseItems defines model for ResponseItems.
+type ResponseItems struct {
+	Items *[]ResponseItem `json:"items,omitempty"`
+}
+
 // ResponseOrder defines model for ResponseOrder.
 type ResponseOrder struct {
 	OrderId *OrderId        `json:"OrderId,omitempty"`
@@ -153,8 +158,14 @@ type ClientInterface interface {
 	// GetOrders request
 	GetOrders(ctx context.Context, userId UserIdInPath, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// GetUsers request
-	GetUsers(ctx context.Context, userId UserIdInPath, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// GetAllUsers request
+	GetAllUsers(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetUserById request
+	GetUserById(ctx context.Context, userId UserIdInPath, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetUserRecommends request
+	GetUserRecommends(ctx context.Context, userId UserIdInPath, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
 func (c *Client) GetItems(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -205,8 +216,32 @@ func (c *Client) GetOrders(ctx context.Context, userId UserIdInPath, reqEditors 
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetUsers(ctx context.Context, userId UserIdInPath, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetUsersRequest(c.Server, userId)
+func (c *Client) GetAllUsers(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetAllUsersRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetUserById(ctx context.Context, userId UserIdInPath, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetUserByIdRequest(c.Server, userId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetUserRecommends(ctx context.Context, userId UserIdInPath, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetUserRecommendsRequest(c.Server, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -318,8 +353,35 @@ func NewGetOrdersRequest(server string, userId UserIdInPath) (*http.Request, err
 	return req, nil
 }
 
-// NewGetUsersRequest generates requests for GetUsers
-func NewGetUsersRequest(server string, userId UserIdInPath) (*http.Request, error) {
+// NewGetAllUsersRequest generates requests for GetAllUsers
+func NewGetAllUsersRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/users")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetUserByIdRequest generates requests for GetUserById
+func NewGetUserByIdRequest(server string, userId UserIdInPath) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -335,6 +397,40 @@ func NewGetUsersRequest(server string, userId UserIdInPath) (*http.Request, erro
 	}
 
 	operationPath := fmt.Sprintf("/users/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetUserRecommendsRequest generates requests for GetUserRecommends
+func NewGetUserRecommendsRequest(server string, userId UserIdInPath) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "userId", runtime.ParamLocationPath, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/users/%s/recommends", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -406,8 +502,14 @@ type ClientWithResponsesInterface interface {
 	// GetOrdersWithResponse request
 	GetOrdersWithResponse(ctx context.Context, userId UserIdInPath, reqEditors ...RequestEditorFn) (*GetOrdersResponse, error)
 
-	// GetUsersWithResponse request
-	GetUsersWithResponse(ctx context.Context, userId UserIdInPath, reqEditors ...RequestEditorFn) (*GetUsersResponse, error)
+	// GetAllUsersWithResponse request
+	GetAllUsersWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetAllUsersResponse, error)
+
+	// GetUserByIdWithResponse request
+	GetUserByIdWithResponse(ctx context.Context, userId UserIdInPath, reqEditors ...RequestEditorFn) (*GetUserByIdResponse, error)
+
+	// GetUserRecommendsWithResponse request
+	GetUserRecommendsWithResponse(ctx context.Context, userId UserIdInPath, reqEditors ...RequestEditorFn) (*GetUserRecommendsResponse, error)
 }
 
 type GetItemsResponse struct {
@@ -476,14 +578,14 @@ func (r GetOrdersResponse) StatusCode() int {
 	return 0
 }
 
-type GetUsersResponse struct {
+type GetAllUsersResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *User
+	JSON200      *[]User
 }
 
 // Status returns HTTPResponse.Status
-func (r GetUsersResponse) Status() string {
+func (r GetAllUsersResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -491,7 +593,51 @@ func (r GetUsersResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r GetUsersResponse) StatusCode() int {
+func (r GetAllUsersResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetUserByIdResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *User
+}
+
+// Status returns HTTPResponse.Status
+func (r GetUserByIdResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetUserByIdResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetUserRecommendsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ResponseItems
+}
+
+// Status returns HTTPResponse.Status
+func (r GetUserRecommendsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetUserRecommendsResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -533,13 +679,31 @@ func (c *ClientWithResponses) GetOrdersWithResponse(ctx context.Context, userId 
 	return ParseGetOrdersResponse(rsp)
 }
 
-// GetUsersWithResponse request returning *GetUsersResponse
-func (c *ClientWithResponses) GetUsersWithResponse(ctx context.Context, userId UserIdInPath, reqEditors ...RequestEditorFn) (*GetUsersResponse, error) {
-	rsp, err := c.GetUsers(ctx, userId, reqEditors...)
+// GetAllUsersWithResponse request returning *GetAllUsersResponse
+func (c *ClientWithResponses) GetAllUsersWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetAllUsersResponse, error) {
+	rsp, err := c.GetAllUsers(ctx, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseGetUsersResponse(rsp)
+	return ParseGetAllUsersResponse(rsp)
+}
+
+// GetUserByIdWithResponse request returning *GetUserByIdResponse
+func (c *ClientWithResponses) GetUserByIdWithResponse(ctx context.Context, userId UserIdInPath, reqEditors ...RequestEditorFn) (*GetUserByIdResponse, error) {
+	rsp, err := c.GetUserById(ctx, userId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetUserByIdResponse(rsp)
+}
+
+// GetUserRecommendsWithResponse request returning *GetUserRecommendsResponse
+func (c *ClientWithResponses) GetUserRecommendsWithResponse(ctx context.Context, userId UserIdInPath, reqEditors ...RequestEditorFn) (*GetUserRecommendsResponse, error) {
+	rsp, err := c.GetUserRecommends(ctx, userId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetUserRecommendsResponse(rsp)
 }
 
 // ParseGetItemsResponse parses an HTTP response from a GetItemsWithResponse call
@@ -620,15 +784,41 @@ func ParseGetOrdersResponse(rsp *http.Response) (*GetOrdersResponse, error) {
 	return response, nil
 }
 
-// ParseGetUsersResponse parses an HTTP response from a GetUsersWithResponse call
-func ParseGetUsersResponse(rsp *http.Response) (*GetUsersResponse, error) {
+// ParseGetAllUsersResponse parses an HTTP response from a GetAllUsersWithResponse call
+func ParseGetAllUsersResponse(rsp *http.Response) (*GetAllUsersResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &GetUsersResponse{
+	response := &GetAllUsersResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []User
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetUserByIdResponse parses an HTTP response from a GetUserByIdWithResponse call
+func ParseGetUserByIdResponse(rsp *http.Response) (*GetUserByIdResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetUserByIdResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -636,6 +826,32 @@ func ParseGetUsersResponse(rsp *http.Response) (*GetUsersResponse, error) {
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest User
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetUserRecommendsResponse parses an HTTP response from a GetUserRecommendsWithResponse call
+func ParseGetUserRecommendsResponse(rsp *http.Response) (*GetUserRecommendsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetUserRecommendsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ResponseItems
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -658,8 +874,14 @@ type ServerInterface interface {
 	// (GET /orders/{userId})
 	GetOrders(ctx echo.Context, userId UserIdInPath) error
 
+	// (GET /users)
+	GetAllUsers(ctx echo.Context) error
+
 	// (GET /users/{userId})
-	GetUsers(ctx echo.Context, userId UserIdInPath) error
+	GetUserById(ctx echo.Context, userId UserIdInPath) error
+
+	// (GET /users/{userId}/recommends)
+	GetUserRecommends(ctx echo.Context, userId UserIdInPath) error
 }
 
 // ServerInterfaceWrapper converts echo contexts to parameters.
@@ -701,8 +923,17 @@ func (w *ServerInterfaceWrapper) GetOrders(ctx echo.Context) error {
 	return err
 }
 
-// GetUsers converts echo context to params.
-func (w *ServerInterfaceWrapper) GetUsers(ctx echo.Context) error {
+// GetAllUsers converts echo context to params.
+func (w *ServerInterfaceWrapper) GetAllUsers(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.GetAllUsers(ctx)
+	return err
+}
+
+// GetUserById converts echo context to params.
+func (w *ServerInterfaceWrapper) GetUserById(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "userId" -------------
 	var userId UserIdInPath
@@ -713,7 +944,23 @@ func (w *ServerInterfaceWrapper) GetUsers(ctx echo.Context) error {
 	}
 
 	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.GetUsers(ctx, userId)
+	err = w.Handler.GetUserById(ctx, userId)
+	return err
+}
+
+// GetUserRecommends converts echo context to params.
+func (w *ServerInterfaceWrapper) GetUserRecommends(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "userId" -------------
+	var userId UserIdInPath
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "userId", runtime.ParamLocationPath, ctx.Param("userId"), &userId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter userId: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.GetUserRecommends(ctx, userId)
 	return err
 }
 
@@ -748,22 +995,25 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.GET(baseURL+"/items", wrapper.GetItems)
 	router.POST(baseURL+"/orders", wrapper.PostOrders)
 	router.GET(baseURL+"/orders/:userId", wrapper.GetOrders)
-	router.GET(baseURL+"/users/:userId", wrapper.GetUsers)
+	router.GET(baseURL+"/users", wrapper.GetAllUsers)
+	router.GET(baseURL+"/users/:userId", wrapper.GetUserById)
+	router.GET(baseURL+"/users/:userId/recommends", wrapper.GetUserRecommends)
 
 }
 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/8RVzY7TMBB+FTRwtOose0G5wQVVHLYCcUIcTDLbepXY7nhSVFV5dzR2uk2ktFt+Kk6J",
-	"7Rl/P2OPD1D5NniHjiOUBwiGTIuMlEZdRFrWS7cyvJGxdVBCkIECZ1qEcggBBYTbzhLWUDJ1qCBWG2yN",
-	"ZL0hfIQSXusTlM6rUX/N6X3fHzMS8JKxXdbyx/sgMJHJujX0Ch6oTilza59x22FkyU5iyAcktpj2tPVL",
-	"ZAbUXsG2M44t70co1jGukUCYDlP+xxNWPAJO3GaQGdvpzyUWYxEnLENk9jIeDL/W11myMXgX8e9tymdg",
-	"phCBcGfx55k1W+H1xmauZ5wdHYZLjI9hvfrtWoysukkxZO1PinDc82wRzoHNXh2Jtu7Ry1KNsSIb2Hq5",
-	"7auHL6/er5aggC03mGdAwQ4p5oi7RbEoZHcf0JlgoYT7RbG4B5VaRdKjn91eI8tHxBqBEDrwEdNxj6mN",
-	"ZMdT8NuikE/lHaNLeSaExlYpUz9FwT9c2WmmpRTBU6EPn2S2V6C9nJbcDX2cYbvyw02PQ9vDyB98vf+H",
-	"VEfdJJO6uS3PYC/5og/50PeXqjmy5//yVpMX7dv8nqcQPXnx+u8iW6auUy3X66aiU7O4mVZ5gpF2x+wp",
-	"ROMr04CCjhooYcMcSq3T5MZHLu+K4l2hZZdfAQAA//+CIx9QUggAAA==",
+	"H4sIAAAAAAAC/8RWwW7bMAz9lYHbUYjc9TL41l6GYIcGHXoadtBstlFhS4pEZwgC//tAyUls1HGCNdlO",
+	"sSRS7/GRefYWCls7a9BQgHwLTnlVI6GPqyagn5dzs1C05LU2kIPjhQCjaoS8CwEBHleN9lhCTr5BAaFY",
+	"Yq0465PHZ8jhozxAyXQa5FNKb9t2lxGB54T1vOQn2jiGCeS1eYFWwIMvY8rY2SOuGgzE2bEYbx160hjv",
+	"1OUpMh1qK2DVKEOaNj0UbQhf0AMz7bbsr1csqAccuY0gE9bDhykW/SIOWMp7teF1J/i5uo6SDc6agO+X",
+	"Kc3ASCOcx7XG30fOdIHnC3vgGt6vbK/wN9JOwR9pbG8Wp3B3Ya24KOFLzAKf/c0M7O48OgPHwEb/uRyt",
+	"zbPloxJD4bUjbdlsFg/fP9wt5iCANFWYdkDAGn1IETezbJbx7dahUU5DDrezbHYLIjpVrEfu1X5B4h8u",
+	"VjEE04GvSGm+2MWS4jH4c5bxT2ENoYl5yrlKFzFTvgbG355pdMNWcsHDQh++8W4rQFqeljTrNoywXdjO",
+	"aELnuhjo3pabC1LtmVkidXVZ9mCndJHbNPTtVDd78vxf3mLwQv0xfuchRA5euO1PLpu3Jkf3rqqewgXK",
+	"PcuRol+8tc6JtkX+Z3WN777fdB8TV+pb4n/tdu3LlR4LW9doynCq8sdD5D+yoXA9IfhrDv16lz2EqGyh",
+	"KhDQ+ApyWBK5XMq4ubSB8pss+5JJvuVPAAAA//+VvroZnQoAAA==",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
