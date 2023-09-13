@@ -145,6 +145,8 @@ components:
     ResponseOrder:
       type: object
       properties:
+        OrderId: 
+          $ref: "#/components/schemas/OrderId"
         userId:
           $ref: "#/components/schemas/UserId"
         items:

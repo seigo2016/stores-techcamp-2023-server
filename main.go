@@ -54,8 +54,9 @@ func (h Server) GetOrders(ctx echo.Context, userId string) error {
 			})
 		}
 		reso = append(reso, ResponseOrder{
-			Items:  &ri,
-			UserId: &userId,
+			OrderId: &i.Uid,
+			Items:   &ri,
+			UserId:  &userId,
 		})
 	}
 	return ctx.JSON(http.StatusOK, reso)
