@@ -13,7 +13,7 @@ def mutation():
     { xid: "item3" name: "item3"  price: 500}
     { xid: "item4" name: "item4"  price: 500}
     { xid: "item5" name: "item5"  price: 500}
-    { xid: "item6" name: "item5"  price: 500}
+    { xid: "item6" name: "item6"  price: 500}
   ]) { numUids }
 }
         """)
@@ -35,7 +35,6 @@ def mutation():
           { xid: "item1" }
           { xid: "item2" }
           { xid: "item3" }
-          { xid: "item5" }
         ] }
       }) { numUids }}
     """)
