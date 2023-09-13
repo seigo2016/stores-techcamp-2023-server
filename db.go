@@ -12,13 +12,108 @@ import (
 	"google.golang.org/grpc"
 )
 
+func getDiff(a, b []db.Item) []db.Item {
+	mb := make(map[string]struct{}, len(b))
+
+	for _, x := range b {
+		mb[x.Uid] = struct{}{}
+	}
+
+	var diff []db.Item
+	for _, x := range a {
+		if _, found := mb[x.Uid]; !found {
+			diff = append(diff, x)
+		}
+	}
+	return diff
+}
+
+func unique(sample []db.User) []db.User {
+	var unique []db.User
+uloop:
+	for _, v := range sample {
+		for i, u := range unique {
+			if v.Name == u.Name {
+				unique[i] = v
+				continue uloop
+			}
+		}
+		unique = append(unique, v)
+	}
+	return unique
+}
+
+func removeUser(s []db.User, deleteTarget db.User) []db.User {
+	result := []db.User{}
+	for i, v := range s {
+		if v.Name == deleteTarget.Name {
+			result = append(s[:i], s[min(i+1, len(s)-1):]...)
+			return result
+		}
+	}
+	return result
+}
+
+func recommend(uid string) ([]db.Item, error) {
+	dc, cancel := getDgraphClient()
+	defer cancel()
+
+	ctx := context.Background()
+
+	orgUser, _ := getUser(uid)
+
+	q1 := fmt.Sprintf(`
+	{
+		node(func: uid("%s")) {
+		  uid
+		  expand(_all_) {
+			uid
+			expand(_all_){expand(_all_)}
+		  }
+		}
+	  }
+	`, uid)
+
+	res, err := dc.NewTxn().Query(ctx, q1)
+	if err != nil {
+		fmt.Println(err)
+	}
+	var decodeu struct {
+		Node []db.User `json:"node,omitempty"`
+	}
+	if err := json.Unmarshal(res.GetJson(), &decodeu); err != nil {
+		return []db.Item{}, err
+	}
+
+	orgItems := decodeu.Node[0].BoughtItems
+	var users []db.User
+
+	for _, i := range orgItems {
+		users = append(users, i.Users...)
+	}
+	users = removeUser(unique(users), orgUser)
+	simCnt := -1
+	var recI []db.Item
+	for _, u := range users {
+		u, _ = getUserByName(u.Name)
+		eq := getDiff(u.BoughtItems, orgItems)
+		cnt := len(eq)
+		if simCnt < cnt {
+			simCnt = cnt
+			recI = eq
+		}
+	}
+	return recI, nil
+
+}
+
 func getAllItems() ([]db.Item, error) {
 	dc, cancel := getDgraphClient()
 	defer cancel()
 
 	ctx := context.Background()
 
-	q1 := `
+	res, err := dc.NewTxn().Query(ctx, `
 	{
 		node(func: has(Item.name)) {
 		  uid
@@ -28,9 +123,7 @@ func getAllItems() ([]db.Item, error) {
 		  }
 		}	
 	  }
-	`
-
-	res, err := dc.NewTxn().Query(ctx, q1)
+	`)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -41,7 +134,6 @@ func getAllItems() ([]db.Item, error) {
 		fmt.Println(err)
 		return []db.Item{}, err
 	}
-	fmt.Printf("%+v\n", decodei.Node)
 
 	item := decodei.Node
 
@@ -77,7 +169,38 @@ func getUser(userId string) (db.User, error) {
 		fmt.Println(err)
 		return db.User{}, err
 	}
-	fmt.Printf("%+v\n", decodeu.Node)
+	user := decodeu.Node[0]
+
+	return user, nil
+}
+
+func getUserByName(userName string) (db.User, error) {
+	dc, cancel := getDgraphClient()
+	defer cancel()
+
+	ctx := context.Background()
+
+	q1 := fmt.Sprintf(`{
+		node(func: eq(User.name, "%s")) {
+		  uid
+		  expand(_all_) {
+			uid
+			expand(_all_)
+		  }
+		}	
+	  }`, userName)
+
+	res, err := dc.NewTxn().Query(ctx, q1)
+	if err != nil {
+		fmt.Println(err)
+	}
+	var decodeu struct {
+		Node []db.User `json:"node,omitempty"`
+	}
+	if err := json.Unmarshal(res.GetJson(), &decodeu); err != nil {
+		fmt.Println(err)
+		return db.User{}, err
+	}
 
 	user := decodeu.Node[0]
 
@@ -110,7 +233,6 @@ func getItem(itemId string) (db.Item, error) {
 		fmt.Println(err)
 		return db.Item{}, err
 	}
-	fmt.Printf("%+v\n", decodei.Node)
 
 	item := decodei.Node[0]
 
@@ -139,7 +261,7 @@ func postOrder(items []db.Item, user db.User) db.Order {
 	}
 
 	mu.SetJson = pb
-	response, err := dc.NewTxn().Mutate(ctx, mu)
+	_, err = dc.NewTxn().Mutate(ctx, mu)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -162,7 +284,7 @@ func postOrder(items []db.Item, user db.User) db.Order {
 	}
 
 	mu.SetJson = pb
-	response, err = dc.NewTxn().Mutate(ctx, mu)
+	response, err := dc.NewTxn().Mutate(ctx, mu)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -233,7 +355,7 @@ func getOrder(uid string) (db.Order, error) {
 	defer cancel()
 
 	ctx := context.Background()
-	fmt.Println(uid)
+
 	q2 := fmt.Sprintf(`
 	{	node(func: uid(%s)) {
 		uid
@@ -247,7 +369,6 @@ func getOrder(uid string) (db.Order, error) {
 	var decodeo struct {
 		Node []db.Order `json:"node,omitempty"`
 	}
-	fmt.Println(res.GetJson())
 	if err := json.Unmarshal(res.GetJson(), &decodeo); err != nil {
 		fmt.Println(err)
 		return db.Order{}, err
