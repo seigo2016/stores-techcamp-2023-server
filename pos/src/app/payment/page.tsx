@@ -25,6 +25,7 @@ export default function PagePayment() {
   };
 
   const buy = () => {
+    if (charge < 0) return;
     createOrder(order);
     router.push("/product");
   };
@@ -41,7 +42,9 @@ export default function PagePayment() {
         <div>
           {charge < 0 ? "金額が不足しています" : `おつり : ${charge}円`}
         </div>
-        <button onClick={buy}>購入を確定する</button>
+        <button className="cursor-pointer" onClick={buy}>
+          購入を確定する
+        </button>
       </div>
     </div>
   );

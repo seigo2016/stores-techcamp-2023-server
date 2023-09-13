@@ -65,7 +65,9 @@ export default function PageProduct() {
             <div>合計金額</div>
             <div>{totalPrice}円</div>
           </div>
-          <button onClick={buy}>購入する</button>
+          <button className="cursor-pointer" onClick={buy}>
+            購入する
+          </button>
         </div>
       </div>
     </div>

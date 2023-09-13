@@ -8,8 +8,12 @@ export default function PagePoint() {
       <div className="flex flex-col gap-[12px]">
         <div>ポイントカードを提示しますか？</div>
         <div className="flex justify-center items-center gap-[24px]">
-          <Link href={{ pathname: "/qrcode" }}>Yes</Link>
-          <Link href={{ pathname: "/payment" }}>No</Link>
+          <Link href={{ pathname: "/qrcode" }} className="cursor-pointer">
+            Yes
+          </Link>
+          <Link href={{ pathname: "/payment" }} className="cursor-pointer">
+            No
+          </Link>
         </div>
       </div>
     </div>

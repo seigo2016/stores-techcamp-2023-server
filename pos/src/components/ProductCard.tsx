@@ -8,7 +8,7 @@ export default function ProductCard(props: {
 }) {
   return (
     <div
-      className="w-[200px] h-[240px] text-sm inline-block"
+      className="w-[200px] h-[240px] text-sm inline-block cursor-pointer"
       onClick={props.onClick}
     >
       <Image src={props.url} alt={props.name} width={200} height={200} />
