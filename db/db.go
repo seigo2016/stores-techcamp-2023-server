@@ -7,7 +7,7 @@ type Item struct {
 	Name    string   `json:"Item.name,omitempty"`
 	Price   int      `json:"Item.price,omitempty"`
 	Preview string   `json:"Item.preview,omitempty"`
-	Shop    string   `json:"Item.shop,omitempty"`
+	Users   []User   `json:"Item.users,omitempty"`
 	DType   []string `json:"dgraph.type,omitempty"`
 }
 

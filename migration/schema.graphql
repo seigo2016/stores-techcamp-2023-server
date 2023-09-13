@@ -1,13 +1,14 @@
 type Item {
     xid: String! @id
-    name: String!
+    name: String! @search
     preview: String
     price: Int!
+    users: [User]
 }
 
 type User {
     xid: String! @id
-    name: String!
+    name: String! @search
     boughtItems: [Item]
     orders: [Order] 
 }
