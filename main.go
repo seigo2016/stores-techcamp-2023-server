@@ -11,7 +11,17 @@ import (
 type Server struct{}
 
 func (h Server) GetItems(ctx echo.Context) error {
-	return ctx.JSON(http.StatusOK, ResponseItem{})
+	items, _ := getAllItems()
+	var it []ResponseItem
+	for _, i := range items {
+		it = append(it, ResponseItem{
+			Id:      &i.Uid,
+			Name:    &i.Name,
+			Price:   &i.Price,
+			Preview: &i.Preview,
+		})
+	}
+	return ctx.JSON(http.StatusOK, it)
 }
 
 func (h Server) GetUsers(ctx echo.Context, userId string) error {
@@ -37,7 +47,7 @@ func (h Server) GetOrders(ctx echo.Context, userId string) error {
 	var reso []ResponseOrder
 	for _, i := range orders {
 		var ri []ResponseItem
-		for _, i := range i.BoughtItem {
+		for _, i := range i.BoughtItems {
 			ri = append(ri, ResponseItem{
 				Id:   &i.Uid,
 				Name: &i.Name,

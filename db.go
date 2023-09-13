@@ -12,6 +12,42 @@ import (
 	"google.golang.org/grpc"
 )
 
+func getAllItems() ([]db.Item, error) {
+	dc, cancel := getDgraphClient()
+	defer cancel()
+
+	ctx := context.Background()
+
+	q1 := `
+	{
+		node(func: has(Item.name)) {
+		  uid
+		  expand(_all_) {
+			uid
+			expand(_all_)
+		  }
+		}	
+	  }
+	`
+
+	res, err := dc.NewTxn().Query(ctx, q1)
+	if err != nil {
+		fmt.Println(err)
+	}
+	var decodei struct {
+		Node []db.Item `json:"node,omitempty"`
+	}
+	if err := json.Unmarshal(res.GetJson(), &decodei); err != nil {
+		fmt.Println(err)
+		return []db.Item{}, err
+	}
+	fmt.Printf("%+v\n", decodei.Node)
+
+	item := decodei.Node
+
+	return item, nil
+}
+
 func getUser(userId string) (db.User, error) {
 	dc, cancel := getDgraphClient()
 	defer cancel()
@@ -88,9 +124,9 @@ func postOrder(items []db.Item, user db.User) db.Order {
 	ctx := context.Background()
 
 	no := db.Order{
-		Uid:        "_:",
-		BoughtItem: items,
-		DType:      []string{"Order"},
+		Uid:         "_:",
+		BoughtItems: items,
+		DType:       []string{"Order"},
 	}
 
 	mu := &api.Mutation{
@@ -110,10 +146,10 @@ func postOrder(items []db.Item, user db.User) db.Order {
 	newOrders := append(user.Orders, no)
 
 	nu := db.User{
-		Uid:        user.Uid,
-		Name:       user.Name,
-		BoughtItem: user.BoughtItem,
-		Orders:     newOrders,
+		Uid:         user.Uid,
+		Name:        user.Name,
+		BoughtItems: user.BoughtItems,
+		Orders:      newOrders,
 	}
 
 	mu = &api.Mutation{
@@ -155,10 +191,10 @@ func buy(itemId string, userId string) {
 	var im []db.Item
 	im = append(im, in)
 	nun := db.User{
-		Uid:        un.Uid,
-		Name:       un.Name,
-		BoughtItem: im,
-		DType:      un.DType,
+		Uid:         un.Uid,
+		Name:        un.Name,
+		BoughtItems: im,
+		DType:       un.DType,
 	}
 
 	mu := &api.Mutation{
