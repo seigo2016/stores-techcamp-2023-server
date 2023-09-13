@@ -1,17 +1,15 @@
 type Item {
     name: String! @id
-    shop: String!
+    preview: String!
     price: Int!
-    users: [User]
-    orders: [Order]
 }
 
 type User {
     name: String! @id
-    boughtItem: [Item]
-    orders: [Order]
+    boughtItems: [Item]
+    orders: [Order] 
 }
 
 type Order {
-    boughtItem: [Item] 
+    boughtItems: [Item]
 }
