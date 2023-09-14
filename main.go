@@ -25,16 +25,22 @@ func (h Server) GetUserRecommends(ctx echo.Context, userId string) error {
 	return ctx.JSON(http.StatusOK, it)
 }
 
+func covif(i db.Item) ResponseItem {
+
+	return ResponseItem{
+		Id:      &i.Uid,
+		Name:    &i.Name,
+		Price:   &i.Price,
+		Preview: &i.Preview,
+	}
+}
+
 func (h Server) GetItems(ctx echo.Context) error {
 	items, _ := getAllItems()
-	var it []ResponseItem
+	it := make([]ResponseItem, 0)
 	for _, i := range items {
-		it = append(it, ResponseItem{
-			Id:      &i.Uid,
-			Name:    &i.Name,
-			Price:   &i.Price,
-			Preview: &i.Preview,
-		})
+		ni := covif(i)
+		it = append(it, ni)
 	}
 	return ctx.JSON(http.StatusOK, it)
 }
