@@ -15,6 +15,7 @@ const orders: Order[] = [
         quantity: 1,
       },
     ],
+    createdAt: new Date(),
   },
   {
     id: "2",
@@ -38,6 +39,7 @@ const orders: Order[] = [
         quantity: 3,
       },
     ],
+    createdAt: new Date(),
   },
 ];
 

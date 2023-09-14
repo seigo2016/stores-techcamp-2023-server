@@ -62,10 +62,10 @@ export default function PageProduct() {
                 <div>{orderedProduct.product.name}</div>
                 <div className="flex gap-[12px]">
                   <div className="flex items-center">
-                    ×{orderedProduct.quantity}
+                    ¥{orderedProduct.product.price}
                   </div>
                   <div className="flex items-center">
-                    ¥{orderedProduct.product.price}
+                    ×{orderedProduct.quantity}
                   </div>
                 </div>
               </div>

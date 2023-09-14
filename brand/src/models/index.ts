@@ -13,4 +13,5 @@ export type OrderedProduct = {
 export type Order = {
   id: string;
   orderedProducts: OrderedProduct[];
+  createdAt: Date;
 };
