@@ -84,7 +84,6 @@ func recommend(uid string) ([]db.Item, error) {
 	if err := json.Unmarshal(res.GetJson(), &decodeu); err != nil {
 		return []db.Item{}, err
 	}
-
 	orgItems := decodeu.Node[0].BoughtItems
 	var users []db.User
 
@@ -103,6 +102,7 @@ func recommend(uid string) ([]db.Item, error) {
 			recI = eq
 		}
 	}
+	fmt.Println(recI)
 	return recI, nil
 
 }
