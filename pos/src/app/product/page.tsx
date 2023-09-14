@@ -35,7 +35,7 @@ export default function PageProduct() {
 
   return (
     <div className="w-screen h-screen flex">
-      <div className="flex-auto p-[32px] flex flex-row flex-wrap gap-[20px] overflow-y-scroll">
+      <div className="flex-auto p-[32px] flex flex-row flex-wrap content-start gap-[20px] overflow-y-scroll">
         {products.map((product, i) => {
           return (
             <ProductCard

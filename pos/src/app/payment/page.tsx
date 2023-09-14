@@ -24,9 +24,9 @@ export default function PagePayment() {
     }
   };
 
-  const buy = () => {
+  const buy = async () => {
     if (charge < 0) return;
-    createOrder(order);
+    await createOrder(order);
     router.push("/product");
   };
 

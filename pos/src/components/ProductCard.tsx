@@ -12,9 +12,9 @@ export default function ProductCard(props: {
       onClick={props.onClick}
     >
       <Image src={props.url} alt={props.name} width={220} height={220} />
-      <div className="p-[12px] flex flex-col space-between">
+      <div className="h-[80px] p-[12px] flex flex-col justify-between">
         <div>{props.name}</div>
-        <div className="text-right">{props.price}円</div>
+        <div className="text-right">¥{props.price}</div>
       </div>
     </div>
   );

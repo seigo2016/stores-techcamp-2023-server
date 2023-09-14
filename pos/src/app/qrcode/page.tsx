@@ -17,9 +17,9 @@ export default function QRCode() {
   });
 
   return (
-    <div className="w-screen h-screen flex flex-col justify-center items-center">
+    <div className="w-screen h-screen flex flex-col justify-center items-center gap-[40px]">
       <video ref={ref} className="w-1/2 h-1/2"></video>
-      <div>QRコードをかざして下さい。</div>
+      <div className="text-[32px] font-medium">QRコードをかざして下さい</div>
     </div>
   );
 }

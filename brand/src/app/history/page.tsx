@@ -24,12 +24,12 @@ export default function PageHistory() {
                 return (
                   <div
                     key={orderedProduct.product.id}
-                    className="flex justify-between"
+                    className="flex flex-col justify-center"
                   >
                     <div>{orderedProduct.product.name}</div>
-                    <div className="flex gap-[8px]">
-                      <div>{orderedProduct.product.price}円</div>
-                      <div>{orderedProduct.quantity}個</div>
+                    <div className="flex justify-end gap-[8px]">
+                      <div>¥{orderedProduct.product.price}</div>
+                      <div>×{orderedProduct.quantity}</div>
                     </div>
                   </div>
                 );
