@@ -34,8 +34,8 @@ export default function PageProduct() {
   };
 
   return (
-    <div className="w-screen h-screen grid grid-rows-[1fr] grid-cols-[3fr_2fr] p-[20px]">
-      <div>
+    <div className="w-screen h-screen flex">
+      <div className="flex-auto p-[32px] flex flex-row flex-wrap gap-[20px] overflow-y-scroll">
         {products.map((product, i) => {
           return (
             <ProductCard
@@ -48,27 +48,37 @@ export default function PageProduct() {
           );
         })}
       </div>
-      <div className="grid grid-rows-[1fr_100px] grid-cols-[1fr]">
+      <div className="flex-none w-[2px] h-full py-[20px]">
+        <div className="h-full bg-[#afafaf]"></div>
+      </div>
+      <div className="flex-none w-[360px] flex flex-col justify-between p-[20px]">
         <div>
           {order.orderedProducts.map((orderedProduct, i) => {
             return (
-              <div key={i}>
+              <div
+                key={i}
+                className="w-full flex justify-between gap-[16px] py-[20px] border-b-[1px] border-[#bababa]"
+              >
                 <div>{orderedProduct.product.name}</div>
-                <div>{orderedProduct.product.price}円</div>
-                <div>{orderedProduct.quantity}個</div>
+                <div className="flex gap-[12px]">
+                  <div className="flex items-center">
+                    ×{orderedProduct.quantity}
+                  </div>
+                  <div className="flex items-center">
+                    ¥{orderedProduct.product.price}
+                  </div>
+                </div>
               </div>
             );
           })}
         </div>
-        <div className="flex justify-between items-center">
-          <div>
-            <div>合計金額</div>
-            <div>{totalPrice}円</div>
-          </div>
-          <button className="cursor-pointer" onClick={buy}>
-            購入する
-          </button>
-        </div>
+        <button
+          className="h-[72px] px-[30px] flex justify-between items-center bg-[#7a4e2f] rounded-[12px] text-[20px] font-bold text-[#ffffff] cursor-pointer"
+          onClick={buy}
+        >
+          <div>¥{totalPrice}</div>
+          <div>お会計へ</div>
+        </button>
       </div>
     </div>
   );
