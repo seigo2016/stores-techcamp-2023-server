@@ -35,7 +35,7 @@ export default function PageProduct() {
 
   return (
     <div className="w-screen h-screen flex">
-      <div className="flex-auto p-[32px] flex flex-row flex-wrap gap-[20px] overflow-y-scroll">
+      <div className="flex-auto p-[32px] flex flex-row flex-wrap content-start gap-[20px] overflow-y-scroll">
         {products.map((product, i) => {
           return (
             <ProductCard
@@ -62,10 +62,10 @@ export default function PageProduct() {
                 <div>{orderedProduct.product.name}</div>
                 <div className="flex gap-[12px]">
                   <div className="flex items-center">
-                    ×{orderedProduct.quantity}
+                    ¥{orderedProduct.product.price}
                   </div>
                   <div className="flex items-center">
-                    ¥{orderedProduct.product.price}
+                    ×{orderedProduct.quantity}
                   </div>
                 </div>
               </div>
