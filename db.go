@@ -8,6 +8,7 @@ import (
 	"github.com/seigo2016/pos-server/db"
 	"reflect"
 	"time"
+	"math"
 
 	"github.com/dgraph-io/dgo/v2"
 	"github.com/dgraph-io/dgo/v2/protos/api"
@@ -49,7 +50,7 @@ func removeUser(s []db.User, deleteTarget db.User) []db.User {
 	result := []db.User{}
 	for i, v := range s {
 		if v.Name == deleteTarget.Name {
-			result = append(s[:i], s[min(i+1, len(s)-1):]...)
+			result = append(s[:i], s[math.Min(i+1, len(s)-1):]...)
 			return result
 		}
 	}
