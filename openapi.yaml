@@ -75,7 +75,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ResponseOrder"
+                type: array
+                items:
+                  $ref: "#/components/schemas/ResponseItems"
   "/orders":
     post:
       operationId: postOrders
