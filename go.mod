@@ -1,6 +1,6 @@
 module pos
 
-go 1.21.1
+go 1.23
 
 require (
 	github.com/dgraph-io/dgo/v2 v2.2.0
