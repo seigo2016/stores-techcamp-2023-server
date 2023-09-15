@@ -50,7 +50,7 @@ func removeUser(s []db.User, deleteTarget db.User) []db.User {
 	result := []db.User{}
 	for i, v := range s {
 		if v.Name == deleteTarget.Name {
-			result = append(s[:i], s[math.Min(i+1, len(s)-1):]...)
+			result = append(s[:i], s[int(math.Min(float64(i+1), float64(len(s)-1))):]...)
 			return result
 		}
 	}
