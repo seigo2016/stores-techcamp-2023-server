@@ -60,7 +60,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ResponseItems"
+                type: array
+                items:
+                  $ref: "#/components/schemas/ResponseItems"
 
   "/orders/{userId}":
     parameters:
