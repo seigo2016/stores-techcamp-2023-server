@@ -91,6 +91,12 @@ export interface ResponseItem {
      * @memberof ResponseItem
      */
     'preview'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof ResponseItem
+     */
+    'quantity'?: number;
 }
 /**
  * 
@@ -117,6 +123,12 @@ export interface ResponseOrder {
      * @memberof ResponseOrder
      */
     'OrderId'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ResponseOrder
+     */
+    'CreatedAt'?: string;
     /**
      * 
      * @type {string}

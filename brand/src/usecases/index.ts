@@ -16,8 +16,8 @@ const guardUndef = <T extends {}>(obj: T): obj is Required<T> => {
   return Object.values(obj).every((v) => v !== undefined);
 };
 
-export const getOrders = (userID: string): Promise<Order[]> => {
-  // const orders = await apiClient.getOrders({ userId: userID }).then((res) => {
+export const getOrders = async (userID: string): Promise<Order[]> => {
+  // return apiClient.getOrders({ userId: userID }).then((res) => {
   //   if (!guardUndef(res.data)) throw new Error("api error");
 
   //   const orderedProducts = res.data.items.map<OrderedProduct>((item) => {
@@ -36,7 +36,7 @@ export const getOrders = (userID: string): Promise<Order[]> => {
   //   return {
   //     id: res.data.OrderId,
   //     orderedProducts: orderedProducts,
-  //     createdAt: res.data.createdAt,
+  //     createdAt: new Date(res.data.CreatedAt),
   //   };
   // });
 
@@ -44,9 +44,32 @@ export const getOrders = (userID: string): Promise<Order[]> => {
 };
 
 export const getUsers = (): Promise<User[]> => {
+  // return apiClient.getAllUsers().then((res) =>
+  //   res.data.map<User>((user) => {
+  //     if (!guardUndef(user)) throw new Error("api error");
+  //     return {
+  //       id: user.id,
+  //       name: user.name,
+  //     };
+  //   })
+  // );
+
   return new Promise((resolve) => resolve(mockUsers));
 };
 
 export const getRecommendedProducts = (userID: string): Promise<Product[]> => {
+  // return apiClient.getUserRecommends({ userId: userID }).then((res) => {
+  //   if (!guardUndef(res.data)) throw new Error("api error");
+  //   return res.data.items.map<Product>((item) => {
+  //     if (!guardUndef(item)) throw new Error("api error");
+  //     return {
+  //       id: item.id,
+  //       name: item.name,
+  //       price: item.price,
+  //       url: item.preview,
+  //     };
+  //   });
+  // });
+
   return new Promise((resolve) => resolve(mockProducts));
 };
