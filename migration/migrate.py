@@ -20,9 +20,9 @@ def mutation():
     bodies.append("""
           mutation {
             item: addUser(input: [
-              { xid: "user1" name: "user1" }
-              { xid: "user2" name: "user2" }
-              { xid: "user3" name: "user3" }
+              { xid: "Gopher" name: "Gopher" }
+              { xid: "Tux" name: "Tux" }
+              { xid: "Moby Dock" name: "Moby Dock" }
             ]) { numUids }
           }
         """)
@@ -30,7 +30,7 @@ def mutation():
     bodies.append("""
       mutation {
         item: updateUser(input: {
-        filter: { xid: { eq: "user1" } }
+        filter: { xid: { eq: "Gopher" } }
         set: { boughtItems: [
           { xid: "sample1" }
           { xid: "sample2" }
@@ -43,7 +43,7 @@ def mutation():
     bodies.append("""
       mutation {
         item: updateUser(input: {
-        filter: { xid: { eq: "user2" } }
+        filter: { xid: { eq: "Tux" } }
         set: { boughtItems: [
           { xid: "sample1" }
           { xid: "sample3" }
@@ -55,7 +55,7 @@ def mutation():
     bodies.append("""
       mutation {
         item: updateUser(input: {
-        filter: { xid: { eq: "user3" } }
+        filter: { xid: { eq: "Moby Dock" } }
         set: { boughtItems: [
           { xid: "sample1" }
           { xid: "sample2" }
@@ -70,9 +70,9 @@ def mutation():
         item: updateItem(input: {
         filter: { xid: { eq: "sample1" } }
         set: { users: [
-          { xid: "user1"}
-          { xid: "user2" }
-          { xid: "user3" }
+          { xid: "Gopher"}
+          { xid: "Tux" }
+          { xid: "Moby Dock" }
         ] }
       }) { numUids }}
     """)
@@ -82,8 +82,8 @@ def mutation():
         item: updateItem(input: {
         filter: { xid: { eq: "sample2" } }
         set: { users: [
-          { xid: "user1"}
-          { xid: "user3" }
+          { xid: "Gopher"}
+          { xid: "Moby Dock" }
         ] }
       }) { numUids }}
     """)
@@ -93,9 +93,9 @@ def mutation():
         item: updateItem(input: {
         filter: { xid: { eq: "sample3" } }
         set: { users: [
-          { xid: "user1" }
-          { xid: "user2" }
-          { xid: "user3" }
+          { xid: "Gopher" }
+          { xid: "Tux" }
+          { xid: "Moby Dock" }
         ] }
       }) { numUids }}
     """)
@@ -105,7 +105,7 @@ def mutation():
         item: updateItem(input: {
         filter: { xid: { eq: "sample4" } }
         set: { users: [
-          { xid: "user3" }
+          { xid: "Moby Dock" }
         ] }
       }) { numUids }}
     """)
@@ -115,7 +115,7 @@ def mutation():
         item: updateItem(input: {
         filter: { xid: { eq: "sample6" } }
         set: { users: [
-          { xid: "user2" }
+          { xid: "Tux" }
         ] }
       }) { numUids }}
     """)

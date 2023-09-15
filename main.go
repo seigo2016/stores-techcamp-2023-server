@@ -3,8 +3,9 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"github.com/seigo2016/pos-server/db"
 	"reflect"
+
+	"github.com/seigo2016/pos-server/db"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -106,9 +107,9 @@ func main() {
 		AllowOrigins:     []string{"*"},
 		AllowCredentials: true,
 	}))
-	u1, _ := getUserByName("user1")
-	u2, _ := getUserByName("user2")
-	u3, _ := getUserByName("user3")
+	u1, _ := getUserByName("Gopher")
+	u2, _ := getUserByName("Tux")
+	u3, _ := getUserByName("Moby Dock")
 	fmt.Println(u1.Uid)
 	fmt.Println(u2.Uid)
 	fmt.Println(u3.Uid)

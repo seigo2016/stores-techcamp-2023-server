@@ -5,10 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"github.com/seigo2016/pos-server/db"
+	"math"
 	"reflect"
 	"time"
-	"math"
+
+	"github.com/seigo2016/pos-server/db"
 
 	"github.com/dgraph-io/dgo/v2"
 	"github.com/dgraph-io/dgo/v2/protos/api"
