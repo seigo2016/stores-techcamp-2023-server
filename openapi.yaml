@@ -77,7 +77,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/ResponseItems"
+                  $ref: "#/components/schemas/ResponseOrder"
   "/orders":
     post:
       operationId: postOrders
