@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"pos/db"
+	"reflect"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -56,14 +57,20 @@ func (h Server) GetUserById(ctx echo.Context, userId string) error {
 
 func (h Server) PostOrders(ctx echo.Context) error {
 	order := &RequestOrder{}
-	ctx.Bind(&order)
-	fmt.Println(order)
+	fmt.Println(ctx.Bind(&order))
 	var it []db.Item
 	for _, i := range *order.Items {
 		ni, _ := getItem(*i.Id)
+		ni.Quantity = *i.Quantity
 		it = append(it, ni)
 	}
-	user, _ := getUser(*order.UserId)
+	fmt.Println(it)
+	var user = db.User{}
+	fmt.Println(order.UserId)
+	if !reflect.DeepEqual(order.UserId, "") {
+		user, _ = getUser(*order.UserId)
+	}
+	fmt.Println(user)
 	o := postOrder(it, user)
 	return ctx.JSON(http.StatusOK, o)
 }
@@ -71,18 +78,22 @@ func (h Server) PostOrders(ctx echo.Context) error {
 func (h Server) GetOrders(ctx echo.Context, userId string) error {
 	orders, _ := getOrders(userId)
 	var reso []ResponseOrder
+
+	fmt.Println(orders)
 	for _, i := range orders {
 		var ri []ResponseItem
 		for _, i := range i.BoughtItems {
 			ri = append(ri, ResponseItem{
-				Id:   &i.Uid,
-				Name: &i.Name,
+				Id:       &i.Uid,
+				Name:     &i.Name,
+				Quantity: &i.Quantity,
 			})
 		}
 		reso = append(reso, ResponseOrder{
-			OrderId: &i.Uid,
-			Items:   &ri,
-			UserId:  &userId,
+			CreatedAt: &i.CreatedAt,
+			OrderId:   &i.Uid,
+			Items:     &ri,
+			UserId:    &userId,
 		})
 	}
 	return ctx.JSON(http.StatusOK, reso)

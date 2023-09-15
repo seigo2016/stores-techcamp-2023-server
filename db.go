@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"log"
 	"pos/db"
+	"reflect"
+	"time"
 
 	"github.com/dgraph-io/dgo/v2"
 	"github.com/dgraph-io/dgo/v2/protos/api"
@@ -244,13 +246,13 @@ func postOrder(items []db.Item, user db.User) db.Order {
 	defer cancel()
 
 	ctx := context.Background()
-
+	now := time.Now()
 	no := db.Order{
 		Uid:         "_:",
 		BoughtItems: items,
+		CreatedAt:   now.Format("2006-01-02T15:04:05"),
 		DType:       []string{"Order"},
 	}
-
 	mu := &api.Mutation{
 		CommitNow: true,
 	}
@@ -265,12 +267,16 @@ func postOrder(items []db.Item, user db.User) db.Order {
 	if err != nil {
 		log.Fatal(err)
 	}
+	if reflect.DeepEqual(user, db.User{}) {
+		fmt.Println("no user")
+		return no
+	}
 	newOrders := append(user.Orders, no)
-
+	newItems := append(user.BoughtItems, items...)
 	nu := db.User{
 		Uid:         user.Uid,
 		Name:        user.Name,
-		BoughtItems: user.BoughtItems,
+		BoughtItems: newItems,
 		Orders:      newOrders,
 	}
 
@@ -369,6 +375,7 @@ func getOrder(uid string) (db.Order, error) {
 	var decodeo struct {
 		Node []db.Order `json:"node,omitempty"`
 	}
+	fmt.Println(res.GetJson())
 	if err := json.Unmarshal(res.GetJson(), &decodeo); err != nil {
 		fmt.Println(err)
 		return db.Order{}, err
