@@ -19,7 +19,7 @@ export default function Recoomend() {
         return (
           <div
             key={recommendedProduct.id}
-            className="w-[240px] flex flex-col gap-[12px] border-[1px] border-[#8E8E8E]  shadow-[0_1px_4px_0_rgba(0,0,0,1)] rounded-[8px]"
+            className="w-[calc(240px_+_24px)] p-[12px] flex flex-col gap-[12px] border-[1px] border-[#8E8E8E]  shadow-[0_1px_4px_0_rgba(0,0,0,1)] rounded-[8px]"
           >
             <Image
               src={recommendedProduct.url}

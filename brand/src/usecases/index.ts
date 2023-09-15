@@ -20,24 +20,29 @@ export const getOrders = async (userID: string): Promise<Order[]> => {
   // return apiClient.getOrders({ userId: userID }).then((res) => {
   //   if (!guardUndef(res.data)) throw new Error("api error");
 
-  //   const orderedProducts = res.data.items.map<OrderedProduct>((item) => {
-  //     if (!guardUndef(item)) throw new Error("api error");
+  //   return res.data.map((order) => {
+  //     if (!guardUndef(order)) throw new Error("api error");
+
+  //     const orderedProducts = order.items.map<OrderedProduct>((item) => {
+  //       if (!guardUndef(item)) throw new Error("api error");
+
+  //       return {
+  //         product: {
+  //           id: item.id,
+  //           name: item.name,
+  //           price: item.price,
+  //           url: item.preview,
+  //         },
+  //         quantity: item.quantity,
+  //       };
+  //     });
+
   //     return {
-  //       product: {
-  //         id: item.id,
-  //         name: item.name,
-  //         price: item.price,
-  //         url: item.preview,
-  //       },
-  //       quantity: item.quantity,
+  //       id: order.OrderId,
+  //       orderedProducts: orderedProducts,
+  //       createdAt: new Date(order.CreatedAt),
   //     };
   //   });
-
-  //   return {
-  //     id: res.data.OrderId,
-  //     orderedProducts: orderedProducts,
-  //     createdAt: new Date(res.data.CreatedAt),
-  //   };
   // });
 
   return new Promise((resolve) => resolve(mockOrders));
@@ -60,8 +65,10 @@ export const getUsers = (): Promise<User[]> => {
 export const getRecommendedProducts = (userID: string): Promise<Product[]> => {
   // return apiClient.getUserRecommends({ userId: userID }).then((res) => {
   //   if (!guardUndef(res.data)) throw new Error("api error");
+
   //   return res.data.items.map<Product>((item) => {
   //     if (!guardUndef(item)) throw new Error("api error");
+
   //     return {
   //       id: item.id,
   //       name: item.name,

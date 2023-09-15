@@ -392,7 +392,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getOrders(userId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ResponseOrder>> {
+        async getOrders(userId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ResponseOrder>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getOrders(userId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -458,7 +458,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getOrders(requestParameters: DefaultApiGetOrdersRequest, options?: AxiosRequestConfig): AxiosPromise<ResponseOrder> {
+        getOrders(requestParameters: DefaultApiGetOrdersRequest, options?: AxiosRequestConfig): AxiosPromise<Array<ResponseOrder>> {
             return localVarFp.getOrders(requestParameters.userId, options).then((request) => request(axios, basePath));
         },
         /**
