@@ -1,5 +1,6 @@
 "use client";
 
+import { User } from "@/models";
 import {
   Dispatch,
   SetStateAction,
@@ -8,24 +9,24 @@ import {
   useState,
 } from "react";
 
-const UserIDContext = createContext<{
-  userID: string;
-  setUserID: Dispatch<SetStateAction<string>>;
-}>({ userID: "", setUserID: () => {} });
+const UserContext = createContext<{
+  user: User;
+  setUser: Dispatch<SetStateAction<User>>;
+}>({ user: { id: "", name: "" }, setUser: () => {} });
 
-export const useUserIDContext = () => {
-  return useContext(UserIDContext);
+export const useUserContext = () => {
+  return useContext(UserContext);
 };
 
-export default function UserIDProvider({
+export default function UserProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [userID, setUserID] = useState("");
+  const [user, setUser] = useState({ id: "", name: "" });
   return (
-    <UserIDContext.Provider value={{ userID, setUserID }}>
+    <UserContext.Provider value={{ user, setUser }}>
       {children}
-    </UserIDContext.Provider>
+    </UserContext.Provider>
   );
 }

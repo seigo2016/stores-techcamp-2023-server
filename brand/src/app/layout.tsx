@@ -1,15 +1,12 @@
 "use client";
 
-import UserIDProvider from "@/contexts";
+import UserProvider from "@/contexts";
 import "./globals.css";
 import { Inter } from "next/font/google";
-import { createContext } from "vm";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 const inter = Inter({ subsets: ["latin"] });
-
-export const userIDCtx = createContext();
 
 export default function RootLayout({
   children,
@@ -25,11 +22,11 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.className + " w-screen h-screen flex flex-col"}>
-        <UserIDProvider>
+        <UserProvider>
           <Header />
-          <main className="flex-auto">{children}</main>
+          <main className="h-[calc(100%_-_132px)]">{children}</main>
           <Footer />
-        </UserIDProvider>
+        </UserProvider>
       </body>
     </html>
   );

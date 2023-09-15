@@ -1,5 +1,5 @@
 export type Product = {
-  id: number;
+  id: string;
   name: string;
   price: number;
   url: string;
@@ -14,4 +14,9 @@ export type Order = {
   id: string;
   orderedProducts: OrderedProduct[];
   createdAt: Date;
+};
+
+export type User = {
+  id: string;
+  name: string;
 };

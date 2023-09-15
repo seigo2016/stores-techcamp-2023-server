@@ -1,20 +1,20 @@
 "use client";
 
-import { useUserIDContext } from "@/contexts";
+import { useUserContext } from "@/contexts";
 import { Order } from "@/models";
 import { getOrders } from "@/usecases";
 import { useEffect, useState } from "react";
 
 export default function PageHistory() {
   const [orders, setOrders] = useState<Order[]>([]);
-  const { userID } = useUserIDContext();
+  const { user } = useUserContext();
 
   useEffect(() => {
-    getOrders(userID).then((orders) => setOrders(orders));
+    getOrders(user.id).then((orders) => setOrders(orders));
   });
 
   return (
-    <div className="w-full h-full p-[12px] flex flex-col items-center gap-[20px] font-normal overflow-y-scroll">
+    <div className="w-full h-full p-[20px] flex flex-col items-center gap-[20px] font-normal overflow-y-scroll">
       {orders.map((order) => {
         return (
           <div
@@ -22,7 +22,7 @@ export default function PageHistory() {
             className="border-[1px] border-[#8E8E8E]  shadow-[0_1px_4px_0_rgba(0,0,0,1)] rounded-[8px] p-[16px] flex flex-col gap-[12px]"
           >
             <div className="text-[12px] italic">2023/09/14/ 16:00:00</div>
-            <div className="flex flex-col gap-[12px]">
+            <div className="flex flex-col gap-[8px]">
               {order.orderedProducts.map((orderedProduct) => {
                 return (
                   <div
