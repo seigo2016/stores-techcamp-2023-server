@@ -16,30 +16,31 @@ const guardUndef = <T extends {}>(obj: T): obj is Required<T> => {
 };
 
 export const getProducts = async (): Promise<Product[]> => {
-  // return apiClient.getItems().then((res) =>
-  //   res.data.map<Product>((item) => {
-  //     if (!guardUndef(item)) throw new Error("api error");
-  //     return {
-  //       id: item.id,
-  //       name: item.name,
-  //       price: item.price,
-  //       url: item.preview,
-  //     };
-  //   })
-  // );
+  return apiClient.getItems().then((res) =>
+    res.data.map<Product>((item) => {
+      if (!guardUndef(item)) throw new Error("api error");
+      return {
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        url: item.preview,
+      };
+    })
+  );
 
-  return new Promise((resolve) => resolve(mockProducts));
+  // return new Promise((resolve) => resolve(mockProducts));
 };
 
 export const createOrder = async (order: Order): Promise<void> => {
-  // await apiClient.postOrders({
-  //   requestOrder: {
-  //     userId: order.userID,
-  //     items: order.orderedProducts.map((orderedProduct) => ({
-  //       id: orderedProduct.product.id,
-  //       quantity: orderedProduct.quantity,
-  //     })),
-  //   },
-  // });
-  return new Promise((resolve) => resolve());
+  await apiClient.postOrders({
+    requestOrder: {
+      userId: order.userID,
+      items: order.orderedProducts.map((orderedProduct) => ({
+        id: orderedProduct.product.id,
+        quantity: orderedProduct.quantity,
+      })),
+    },
+  });
+
+  // return new Promise((resolve) => resolve());
 };

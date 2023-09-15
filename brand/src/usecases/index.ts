@@ -17,66 +17,66 @@ const guardUndef = <T extends {}>(obj: T): obj is Required<T> => {
 };
 
 export const getOrders = async (userID: string): Promise<Order[]> => {
-  // return apiClient.getOrders({ userId: userID }).then((res) => {
-  //   if (!guardUndef(res.data)) throw new Error("api error");
+  return apiClient.getOrders({ userId: userID }).then((res) => {
+    if (!guardUndef(res.data)) throw new Error("api error");
 
-  //   return res.data.map((order) => {
-  //     if (!guardUndef(order)) throw new Error("api error");
+    return res.data.map((order) => {
+      if (!guardUndef(order)) throw new Error("api error");
 
-  //     const orderedProducts = order.items.map<OrderedProduct>((item) => {
-  //       if (!guardUndef(item)) throw new Error("api error");
+      const orderedProducts = order.items.map<OrderedProduct>((item) => {
+        if (!guardUndef(item)) throw new Error("api error");
 
-  //       return {
-  //         product: {
-  //           id: item.id,
-  //           name: item.name,
-  //           price: item.price,
-  //           url: item.preview,
-  //         },
-  //         quantity: item.quantity,
-  //       };
-  //     });
+        return {
+          product: {
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            url: item.preview,
+          },
+          quantity: item.quantity,
+        };
+      });
 
-  //     return {
-  //       id: order.OrderId,
-  //       orderedProducts: orderedProducts,
-  //       createdAt: new Date(order.CreatedAt),
-  //     };
-  //   });
-  // });
+      return {
+        id: order.OrderId,
+        orderedProducts: orderedProducts,
+        createdAt: new Date(order.CreatedAt),
+      };
+    });
+  });
 
-  return new Promise((resolve) => resolve(mockOrders));
+  // return new Promise((resolve) => resolve(mockOrders));
 };
 
 export const getUsers = (): Promise<User[]> => {
-  // return apiClient.getAllUsers().then((res) =>
-  //   res.data.map<User>((user) => {
-  //     if (!guardUndef(user)) throw new Error("api error");
-  //     return {
-  //       id: user.id,
-  //       name: user.name,
-  //     };
-  //   })
-  // );
+  return apiClient.getAllUsers().then((res) =>
+    res.data.map<User>((user) => {
+      if (!guardUndef(user)) throw new Error("api error");
+      return {
+        id: user.id,
+        name: user.name,
+      };
+    })
+  );
 
-  return new Promise((resolve) => resolve(mockUsers));
+  // return new Promise((resolve) => resolve(mockUsers));
 };
 
 export const getRecommendedProducts = (userID: string): Promise<Product[]> => {
-  // return apiClient.getUserRecommends({ userId: userID }).then((res) => {
-  //   if (!guardUndef(res.data)) throw new Error("api error");
+  return apiClient.getUserRecommends({ userId: userID }).then((res) => {
+    if (!guardUndef(res.data)) throw new Error("api error");
 
-  //   return res.data.items.map<Product>((item) => {
-  //     if (!guardUndef(item)) throw new Error("api error");
+    return res.data.items.map<Product>((item) => {
+      if (!guardUndef(item)) throw new Error("api error");
 
-  //     return {
-  //       id: item.id,
-  //       name: item.name,
-  //       price: item.price,
-  //       url: item.preview,
-  //     };
-  //   });
-  // });
+      return {
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        url: item.preview,
+      };
+    });
+  });
 
-  return new Promise((resolve) => resolve(mockProducts));
+  // return new Promise((resolve) => resolve(mockProducts));
 };
