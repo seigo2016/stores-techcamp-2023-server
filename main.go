@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"pos/db"
+	"github.com/seigo2016/pos/db"
 	"reflect"
 
 	"github.com/labstack/echo/v4"

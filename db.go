@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"pos/db"
+	"github.com/seigo2016/pos/db"
 	"reflect"
 	"time"
 

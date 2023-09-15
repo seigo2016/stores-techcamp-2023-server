@@ -1,4 +1,4 @@
-module pos
+module github.com/seigo2016/pos
 
 go 1.23
 
