@@ -8,6 +8,10 @@ const configuration = new Configuration();
 const basePath = "https://40nb8mhm-10081.asse.devtunnels.ms";
 const axiosInstance = axios.create({
   withCredentials: false,
+  headers: {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+  },
 });
 
 const apiClient = DefaultApiFactory(configuration, basePath, axiosInstance);
