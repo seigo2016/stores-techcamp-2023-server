@@ -150,6 +150,8 @@ components:
           type: integer
         preview:
           type: string
+        quantity:
+          type: integer
   
     RequestItem:
       type: object
@@ -174,6 +176,9 @@ components:
       properties:
         OrderId: 
           $ref: "#/components/schemas/OrderId"
+        CreatedAt:
+          type: string
+          format: datetime
         userId:
           $ref: "#/components/schemas/UserId"
         items:

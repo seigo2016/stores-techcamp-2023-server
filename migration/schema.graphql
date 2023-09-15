@@ -4,6 +4,7 @@ type Item {
     preview: String
     price: Int!
     users: [User]
+    quantity: Int
 }
 
 type User {
@@ -15,4 +16,6 @@ type User {
 
 type Order {
     boughtItems: [Item]
+    createdAt: DateTime
+    quantity: Int
 }
